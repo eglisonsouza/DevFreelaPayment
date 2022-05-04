@@ -1,4 +1,5 @@
 ﻿using DevFreela.Payments.Aplication.Model;
+using DevFreela.Payments.Aplication.Model.UI;
 using DevFreela.Payments.Aplication.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,28 +19,22 @@ namespace DevFreela.Payments.Aplication.Consumers
         private const string QUEUE_PAYMENT = "Payments";
         private const string QUEUE_PAYMENT_APPROVED = "PaymentsApproved";
 
-        public ProcessPaymentConsumer(IServiceProvider serviceProvider)
+        public ProcessPaymentConsumer(IServiceProvider serviceProvider, ApiSettings apiSettings)
         {
             _serviceProvider = serviceProvider;
 
-            var factory = new ConnectionFactory ()
-            {
-                HostName = "localhost",
-                Port = 6001,
-            };
+            _connection = CreateConnection(apiSettings);
 
-            _connection = factory.CreateConnection();
-            
             _channel = _connection.CreateModel();
 
             QueueDeclare();
         }
 
-        private IConnection CreateConnection()
+        private IConnection CreateConnection(ApiSettings apiSettings)
         {
             return new ConnectionFactory
             {
-                HostName = "localhost"
+                HostName = apiSettings.Services.RabbitMQ
             }.CreateConnection();
         }
 
@@ -79,31 +74,47 @@ namespace DevFreela.Payments.Aplication.Consumers
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (sender, eventArgs) =>
             {
-                var byteArray = eventArgs.Body.ToArray();
-                var paymentInfoJson = Encoding.UTF8.GetString(byteArray);
+                try
+                {
+                    var paymentInfo = JsonSerializer.Deserialize<PaymentInfoInputModel>(GetPaymentInfoJson(eventArgs));
 
-                var paymentInfo = JsonSerializer.Deserialize<PaymentInfoInputModel>(paymentInfoJson);
+                    ProcessPayment(paymentInfo!);
 
-                ProcessPayment(paymentInfo!);
+                    PublishMessage(paymentInfo!);
 
-                var paymentApproved = new PaymentApprovedIntegrationEvent(paymentInfo.IdProject);
-                var paymentApprovedJson = JsonSerializer.Serialize(paymentApproved);
-                var paymentApprovedBytes = Encoding.UTF8.GetBytes(paymentApprovedJson);
+                    _channel.BasicAck(eventArgs.DeliveryTag, false);
 
-                _channel.BasicPublish
-                    (
-                        exchange: String.Empty,
-                        routingKey: QUEUE_PAYMENT_APPROVED,
-                        basicProperties: null,
-                        body: paymentApprovedBytes
-                    );
-
-                _channel.BasicAck(eventArgs.DeliveryTag, false);
+                }
+                catch
+                {
+                    _channel.BasicNack(eventArgs.DeliveryTag, false, true);
+                }
             };
 
             _channel.BasicConsume(QUEUE_PAYMENT, false, consumer);
 
             return Task.CompletedTask;
+        }
+
+        private void PublishMessage(PaymentInfoInputModel paymentInfo)
+        {
+            _channel.BasicPublish
+                (
+                    exchange: string.Empty,
+                    routingKey: QUEUE_PAYMENT_APPROVED,
+                    basicProperties: null,
+                    body: GetBody(paymentInfo!)
+                );
+        }
+
+        private static string GetPaymentInfoJson(BasicDeliverEventArgs eventArgs)
+        {
+            return Encoding.UTF8.GetString(eventArgs.Body.ToArray());
+        }
+
+        private static byte[] GetBody(PaymentInfoInputModel paymentInfo)
+        {
+            return new PaymentApprovedIntegrationEvent(paymentInfo!.IdProject).ToBytes();
         }
 
         private void ProcessPayment(PaymentInfoInputModel paymentInfoInputModel)

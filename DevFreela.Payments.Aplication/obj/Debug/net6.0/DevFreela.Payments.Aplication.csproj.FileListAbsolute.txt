@@ -1,0 +1,12 @@
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\bin\Debug\net6.0\DevFreela.Payments.Aplication.deps.json
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\bin\Debug\net6.0\DevFreela.Payments.Aplication.dll
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\bin\Debug\net6.0\DevFreela.Payments.Aplication.pdb
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\obj\Debug\net6.0\DevFreela.Payments.Aplication.csproj.AssemblyReference.cache
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\obj\Debug\net6.0\DevFreela.Payments.Aplication.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\obj\Debug\net6.0\DevFreela.Payments.Aplication.AssemblyInfoInputs.cache
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\obj\Debug\net6.0\DevFreela.Payments.Aplication.AssemblyInfo.cs
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\obj\Debug\net6.0\DevFreela.Payments.Aplication.csproj.CoreCompileInputs.cache
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\obj\Debug\net6.0\DevFreela.Payments.Aplication.dll
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\obj\Debug\net6.0\refint\DevFreela.Payments.Aplication.dll
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\obj\Debug\net6.0\DevFreela.Payments.Aplication.pdb
+C:\Projects\DevFreela.Payments.API\DevFreela.Payments.Aplication\obj\Debug\net6.0\ref\DevFreela.Payments.Aplication.dll
